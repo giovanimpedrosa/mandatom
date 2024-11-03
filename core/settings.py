@@ -12,9 +12,6 @@ STATIC_DIR=os.path.join(BASE_DIR,'static')
 # Adicionar essa tag para que nosso projeto encontre o .env
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-_!ojc!bpn=%&jtwk0n3--ksdoqch9k1c((7ghfyq4_^$e_%%(k'
 
@@ -55,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+	'accounts',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders'
@@ -69,7 +67,37 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'requestlogs.middleware.RequestLogsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'requestlogs.views.exception_handler',
+}
+
+# Logs
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'requestlogs_to_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'info.log',
+        },
+    },
+    'loggers': {
+        'requestlogs': {
+            'handlers': ['requestlogs_to_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+REQUESTLOGS = {
+    'SECRETS': ['password', 'token'],
+    'METHODS': ('PUT', 'PATCH', 'POST', 'DELETE'),
+}
 
 
 ROOT_URLCONF = 'core.urls'
